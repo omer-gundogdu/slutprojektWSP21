@@ -1,0 +1,2 @@
+#definitions and such -> for example register_user or edit_post etc.  alla sql kod ska vara här och bcrypt, password check
+#en admin ska ha tillgång till allt, varje person får tillgång till sina annonser, anonym får inte tillgång till edit eller köp.
