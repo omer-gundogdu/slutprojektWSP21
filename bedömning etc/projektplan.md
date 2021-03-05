@@ -13,5 +13,5 @@ Mitt projekt ska vara en blocket liknande sida där det kommer att finnas en inl
 <h3>I den tredje sidan kommer jag att ha mina försäljningar</h3><br>
 
 ## 3. Databas med ER-diagram (Bild på ER-diagram).
-![Er-diagram](projektet/misc/er-diagram.png)
+![Er-diagram](..\projektet\misc\er-diagram.png)
 ## 4. Arkitektur (Beskriv filer och mappar - vad gör/innehåller de?).
