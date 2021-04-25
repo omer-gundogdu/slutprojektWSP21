@@ -9,6 +9,14 @@ html lang="en"
     nav
       a href="/showregister" Register
       a href="/" Login
+      / - if session[:id].to_i.nil?
+      /   a href="/fix/main" Home
+      / - else 
+        a href="/" xdxd
+
     h1 Welcome to Catchy name!
 
     == yield
+
+
+    

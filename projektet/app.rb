@@ -1,63 +1,100 @@
 require 'sinatra'
 require 'slim'
-require 'sqlite3'
+require 'SQLite3'
 require 'bcrypt'
 require 'byebug'
 require_relative './model.rb'
 
 enable :sessions
 
-get('/showregister') do
-  slim(:register)
-end
-
 get('/') do
   slim(:login)
 end
 
+post '/mina_annonser' do
+  id = session[:id].to_i
+  db = SQLite3::Database.new("db/database.db")
+  db.results_as_hash = true
+  result = db.execute("SELECT * FROM posts WHERE id = ?", id)
+  redirect ('/posts/show')
+end
+get '/mina_annonser' do
+  name = params[:namn]
+  price = params[:pris]
+  id = session[:id].to_i
+  db = SQLite3::Database.new('db/database.db')
+  db.results_as_hash = true
+  result = db.execute('SELECT * FROM posts WHERE user_id = ?', id)
+  slim(:"/posts/show",locals:{posts:result})
+end
 
+get ('/posts/ny_annons') do
+  slim(:'/posts/ny_annons')
+end
+post ('/posts/ny_annons') do
+  name = params[:namn]
+  price = params[:pris]
+  user_id = session[:id].to_i
+  db = SQLite3::Database.new("db/database.db")
+  db.results_as_hash = true
+  db.execute("INSERT INTO posts (name, price, user_id) VALUES (?,?,?)", name, price, user_id)
+  redirect('/posts/ny_annons')
+end
 
-# post('/login') do
-#   username = params[:username]
-#   username = params[:password]
-#   db = sqlite3::Database.new('db/database.db')
-#   db.results_as_hash = true
-#   result = db.execute("SELECT * FROM users WHERE username = ?", username).first
-#   pwdigest = result["pwdigest"]
-#   id = result["id"]
+get ("/posts/annonser") do
+  id = session[:id].to_i
+  user_id = 
+  db = SQLite3::Database.new("db/database.db")
+  db.results_as_hash = true
+  result = db.execute("SELECT * FROM posts")
+  slim(:"/posts/annonser",locals:{posts:result})
+end
 
-#   if BCrypt::Password.new(pwdigest) == password
-#     session[:id] = id 
-    
-#     redirect('main')
-#   else
-#     "Wrong password."
-#   end
-# end
+get('/index') do
+  slim(:index)
+end
 
- get('/main') do
-   id = session[:id].to_i
-   db = sqlite3::Database.new('db/database.db')
-   db.results_as_hash = true
-   result = db.execute("SELECT * FROM database WHERE user_id = ?",id)
-   slim(:"/main/index", locals:{main:result})
- end
+post('/login') do
+  username = params[:username]
+  password = params[:password]
+  db = SQLite3::Database.new('db/database.db')
+  db.results_as_hash = true
+  result = db.execute("SELECT * FROM users WHERE username = ?", username).first
+  pwdigest = result["pwdigest"]
+  id = result["id"]
 
-
+  if BCrypt::Password.new(pwdigest) == password
+    session[:id] = id 
+    redirect('index')
+  else
+    "Wrong password."
+    slim(:'wrong_login')
+  end
+end
 post('/users/new') do
   username = params[:username]
   password = params[:password]
-  password_confirm[:password_confirm]
+  password_confirm = params[:password_confirm]
 
-  end
+  if (password == password_confirm)
+    password_digest = BCrypt::Password.create(password)
+    db = SQLite3::Database.new('db/database.db')
+    db.execute("INSERT INTO users (username, pwdigest) VALUES (?,?)", username, password_digest)
+    redirect('/index')
 
-   if (password == password_confirm)
-     password_digest = BCrypt::Password.create(password)
-     db = sqlite3::Database.new('db/database.db')
-     db.execute("INSERT INTO users (username, pwdigest) VALUES (?,?)", username, password_diges)
-     redirect('/main')
-
-    else
-    "Lösenorden matchar inte"
+  else
+  "Lösenorden matchar inte"
   end
 end
+get('/showregister') do
+  slim(:register)
+end
+
+# get('/post/:post_id') do
+#   post_id = params[:post_id]
+#   user_id = session[:id].to_i
+#   db = SQLite3::Database.new("db/database.db")
+#   db.results_as_hash = true
+#   result = db.execute("SELECT * FROM posts WHERE user_id = ?", id)
+#   slim(:"/posts/#{post["post_id"]}", locals:{posts:result})
+# end
